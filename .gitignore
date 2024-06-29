@@ -1,0 +1,6 @@
+./code/model/custom/
+./data/
+*.pt
+*.csv
+*.npy
+*.zip
