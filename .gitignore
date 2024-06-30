@@ -1,6 +1,5 @@
-./code/model/custom/
-./data/
-*.pt
+./code/model/custom/net/
 *.csv
 *.npy
 *.zip
+*80.pt
