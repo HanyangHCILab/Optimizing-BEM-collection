@@ -1,4 +1,4 @@
-./code/model/custom/net/
+./code/model/custom/GCN.py
 *.csv
 *.npy
 *.zip
