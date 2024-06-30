@@ -8,7 +8,7 @@ def pre_process(data):
     data = data - np.tile(data[:,0:1,0:3],(1,150,16))
     return data
 
-devices = ['mocap','3DPE','kinect','iphone']
+devices = ['kinect','iphone']
 
 for device in devices:
     train_data_path =   f"{device}.npy"

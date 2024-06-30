@@ -104,10 +104,10 @@ def train(args):
     device = "cuda"
     if(args.predefined == "custom"):
         model = select_model(model_type).to(device)
+        torch.save(model,f"model/{model_type}.pt")
     else:
-        # asdas 
-        print("hi")   
-    torch.save(model,f"model/{model_type}.pt")
+        model = torch.load(f"model/{model_type}.pt")
+
     # save model
     if not os.path.exists(f"../pretrained_models/{model_type}"):
         os.mkdir(f"../pretrained_models/{model_type}")
@@ -198,7 +198,7 @@ def evaluate(args):
 
             # preprocessing data (scaling, transform input)
             _, val_set = preprocess_data(dataset,model_type)
-            val_loader = DataLoader(val_set, batch_size=256, shuffle=False)
+            val_loader = DataLoader(val_set, batch_size=64, shuffle=False)
 
             # load pretrained model
             device = 'cuda'
@@ -231,11 +231,11 @@ def evaluate(args):
 
               f1_score_ = f1_score(y_true, y_pred, average='micro')
               tables[i,j] = f1_score_
+              print(f1_score_)
         
     tables = pd.DataFrame(data = tables, columns = models)
     tables.index = devices
     print(tables)
-            # save the result (f1-score)
     return 0
 
 

@@ -42,3 +42,4 @@ if __name__ == "__main__":
         np.save(f"train/{device}_train_label.npy",y_tr)
         np.save(f"test/{device}_test.npy",X_te)
         np.save(f"test/{device}_test_label.npy",y_te)
+        print(y_te)
