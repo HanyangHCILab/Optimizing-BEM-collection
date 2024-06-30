@@ -3,3 +3,4 @@
 *.npy
 *.zip
 *80.pt
+code/model/custom/net/
