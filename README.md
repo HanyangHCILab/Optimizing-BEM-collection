@@ -35,3 +35,5 @@ python train.py -m {model_name} -d {data_type} -p {predefined | custom}
 ```
 python train.py -e True
 ```
+
+![image](https://github.com/HanyangHCILab/Optimizing-BEM-collection/assets/81300282/0d08a7c7-335b-4233-ad4f-8efd734adf22)
