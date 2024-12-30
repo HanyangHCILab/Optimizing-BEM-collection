@@ -1,4 +1,5 @@
-# Optimizing-BEM-collection
+# Behavioral-Research-Methodologies-for-bodily-emotion-recognition
+
 The code for optimizing  bodily emotion motion data collection method
 
 ### 1. Set Environment
@@ -10,13 +11,12 @@ The code for optimizing  bodily emotion motion data collection method
 ```
 
 
-### 2. Download Data & Pertrained model
+### 2. Download Data 
 * You can download the data from this link : https://zenodo.org/records/12577086
 * Transfrom the data from csv to numpy array ( number of data x time series x joints x axes )
 * You can do this just execute the python code  data/{expertise | device | stimulus}/train_test_split.py
 __ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ 
-* You can download the pretrained pytorch model from this link: https://drive.google.com/drive/folders/1lYuZZNhmk6-fLwA-HJp-jCrAF5r5BisH?usp=drive_link
-* Save it to pretrained/(CNN/LSTM/GCN/Transformer) directory
+
 
 
 ### 3. Training the model
