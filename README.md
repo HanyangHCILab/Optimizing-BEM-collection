@@ -15,8 +15,8 @@ conda env create -f environment.yml
 
 ### 2. Download Data & Pertrained model
 * You can download the data from this link : https://zenodo.org/records/12577086
-* Transfrom the data from csv to numpy array ( number of data x time series x joints x axes ) and save it as (mocap.npy | 3DPE.npy | kinect.npy | iphone.npy) in data/device directory
-* Label should be saved in the form of sparse int ( 0 ~ 6 ) and the name should be "device_label.npy"
+* Transfrom the data from csv to numpy array ( number of data x time series x joints x axes )
+* You can do this just execute the python code  data/{expertise | device | stimulus}/train_test_split.py
 __ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ 
 * You can download the pretrained pytorch model from this link: https://drive.google.com/drive/folders/1lYuZZNhmk6-fLwA-HJp-jCrAF5r5BisH?usp=drive_link
 * Save it to pretrained/(CNN/LSTM/GCN/Transformer) directory
@@ -25,13 +25,20 @@ __ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ __
 ### 3. Training the model
 * You can train the model by following code
 ```
-python train.py -m {model_name} -d {data_type} -p {predefined | custom} 
+python train.py -s {study_name} -m {model_name} -d {data_type} -p {predefined | custom} 
 ```
+* study_name = expertise | device | stimulus
 * model_name = CNN | LSTM | GCN | Transformer
-* data_type  = mocap | 3DPE | kinect | iphone
+* data_type
+*   expertise: nonactor | actor
+*   device: mocap | 3DPE | kinect | iphone
+*   stimulus: word | picture | video
 * predefined : if predefined then use .pt model else use {model}.py code ( you can custom the model architecture )
 
 ### 4. Evaluate the model
 ```
-python train.py -e True
+python train.py -s {study_name} -e True
 ```
+> Execution result
+> 
+![image](https://github.com/HanyangHCILab/Optimizing-BEM-collection/assets/81300282/80748059-2538-4ec6-bccd-b767d9f62708)
