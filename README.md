@@ -9,7 +9,7 @@ The code for optimizing  bodily emotion motion data collection method
 * Pytorch:  1.13.1
 * Timm:  0.9.2
 ```
-
+__ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ 
 
 ### 2. Download Data 
 * You can download the data from this link : [https://zenodo.org/records/14576033](https://zenodo.org/records/14576033)
@@ -32,6 +32,8 @@ python train.py -s {study_name} -m {model_name} -d {data_type} -p {predefined | 
   *   device: mocap | 3DPE | kinect | iphone
   *   stimulus: word | picture | video
 * predefined : if predefined then use .pt model else use {model}.py code ( you can custom the model architecture )
+
+__ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ 
 
 ### 4. Evaluate the model
 ```
