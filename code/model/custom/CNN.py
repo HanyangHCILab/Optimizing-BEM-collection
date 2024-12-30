@@ -1,3 +1,4 @@
+from torchsummary import summary
 import timm
 import numpy as np
 import torch
@@ -6,6 +7,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data import TensorDataset
 import time
 import torch.nn.functional as F
+
 
 class CNN(nn.Module):
 
@@ -26,7 +28,5 @@ model = CNN()
 
 device = "cpu"
 model = model.to(device)
-
-from torchsummaryX import summary
-if __name__ == "__main__":
-    summary(model, torch.rand((1, 3, 150,18)).to(device))
+# from torchsummaryX import summary
+# summary(model, torch.rand((1, 3, 150,18)).to(device))

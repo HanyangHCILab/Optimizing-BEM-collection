@@ -21,3 +21,4 @@ for data_type in devices:
             trial = trial_index[label_1p[j]] +1
             trial_index[label_1p[j]] = trial_index[label_1p[j]] +1 
             arr_1t.to_csv(f"csv/{data_type}/{i+1}_{label_1p[j]+1}_{int(trial)}.csv")
+            

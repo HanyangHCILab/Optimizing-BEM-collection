@@ -46,8 +46,9 @@ def extract_feature(data):
     g_w = (velocitiy**2)
     g_w = np.where(g_w > 1, np.median(g_w), g_w)
     weight = np.percentile(g_w, 95,axis=1)
+    print(g_w.shape)
 
-    features= [angle_arm,angle_leg,g_angle_range_arm,g_angle_range_leg,g_angle_range_torso,shoulder_ratio,velocity,acceleration,jerk,space,vertical_movements,weight,distance,area]
+    features= [angle_arm,g_angle_range_arm,limb_contraction,shoulder_ratio,velocity,acceleration,jerk,space,vertical_movements,weight]
 
     return features
 
@@ -180,22 +181,33 @@ def reshaping(arr, type = "tile"):
 
 
 def transform_features(arr):
-    arrlist = []
-    for e in arr:
-        arrlist.append(e.mean())
+    f1 = np.concatenate([arr[0][:,:,1:3],arr[0][:,:,4:]],axis=2).mean(axis=1) #4
+    f2 = np.concatenate([arr[1][:,1:3],arr[1][:,4:]],axis=1) #4
+    f3 = arr[2].mean(axis=1) #4
+    f4 = arr[3].mean(axis=1) #16
+    f5 = arr[4].mean(axis=1)#16
+    f6 = arr[5].mean(axis=1) #16
+    f7 = arr[6].mean(axis=1) #16
+    f8 = arr[7]  #16
+    f9 = arr[8].mean(axis=1) #16
+    f10 = arr[9] #16
+    print(f1.shape,f2.shape,f3.shape,f4.shape,f5.shape,f6.shape,f7.shape,f8.shape,f9.shape,f10.shape)
+    arrlist = np.concatenate([f1,f2,f3,f4,f5,f6,f7,f8,f9,f10],axis=1)
     return np.array(arrlist)
 
+import argparse
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d', '--data', type=str, metavar='DATAPATH', help='data path', default = "None")
+    opts = parser.parse_args()
+    return opts
 
+if __name__ == "__main__":
 
+    opt = parse_args()
+    data = np.load(opt.data)
+    features = extract_feature(data)
 
-features_trans_g = []
-for e in features_g:
-    features_trans_g.append(transform_features(e).reshape(-1,1))
-Feature_g = np.concatenate(features_trans_g,axis=1)
-
-
-np.save("rgb_real_feature.npy",Feature_g)
-#np.save("expert_feature_48.npy",Feature_e)
-
-Feature_g.shape
+    feature_total = transform_features(features)
+    np.save(f"{opt.data[:-4]}_feature.npy",feature_total)

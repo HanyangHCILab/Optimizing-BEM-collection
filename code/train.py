@@ -25,8 +25,10 @@ def parse_args():
     parser.add_argument('-c', '--checkpoint', type=str, metavar='PATH', help='checkpoint directory', default = "None")
     parser.add_argument('-m', '--model_type', default='CNN', type=str, help='type of model: CNN, GCN, LSTM, Transformer')
     parser.add_argument('-e', '--evaluate',  type=str, metavar='FILENAME', help='checkpoint to evaluate (file name)', default = "False")
-    parser.add_argument('-d', '--data_type',  type=str, metavar='FILENAME', help='type_of_data: mocap, kinect, iphone, 3DPE',default = "mocap")
+    parser.add_argument('-d', '--data_type',  type=str, metavar='FILENAME', help='type_of_data for comparision')
     parser.add_argument('-p', '--predefined',  type=str, metavar='FILENAME', help='custom or predefined',default = "predefined")
+    parser.add_argument('-o', '--optimize',  type=str, metavar='FILENAME', help='custom or general',default = "general")
+    parser.add_argument('-s', '--study_type',  type=str, metavar='FILENAME', help='expertise, device, or stimulus',default = "device")
 
     opts = parser.parse_args()
     return opts
@@ -37,47 +39,99 @@ from torch.utils.data import TensorDataset
 import numpy as np
 import pandas as pd
 from data_processing import scaling_data, transfer_input_shape
+from sklearn.preprocessing import StandardScaler
 
-
-def load_data(data_type):
-    train_data_path = "../data/device/train/" +  f"{data_type}_train.npy"
-    train_label_path = "../data/device/train/" +  f"{data_type}_train_label.npy"
-    test_data_path = "../data/device/test/" +  f"{data_type}_test.npy"
-    test_label_path = "../data/device/test/" +  f"{data_type}_test_label.npy"
+def load_data( data_type, model_type, study_type):
+    if(model_type == "LDA" or model_type =="RF"):
+        data_type = data_type + "_feature"
+    train_data_path = f"../data/{study_type}/train/" +  f"{data_type}_train.npy"
+    train_label_path = f"../data/{study_type}/train/" +  f"{data_type}_train_label.npy"
+    test_data_path = f"../data/{study_type}/test/" +  f"{data_type}_test.npy"
+    test_label_path = f"../data/{study_type}/test/" +  f"{data_type}_test_label.npy"
   
-    X_train = np.load(train_data_path)
-    y_train = np.load(train_label_path)
-    X_test = np.load(test_data_path)
-    y_test = np.load(test_label_path)
+    x_train = np.load(train_data_path )
+    x_train = np.concatenate([x_train[:,:,0:12],x_train[:,:,15:24],x_train[:,:,27:]],axis=2)
+    y_train = np.array([0,1,2,3,4,5,6]*300)
 
-    return (X_train, y_train, X_test, y_test)
+    x_test = np.load(test_data_path)
+    x_test = np.concatenate([x_test[:,:,0:12],x_test[:,:,15:24],x_test[:,:,27:]],axis=2)
+    y_test =  np.array([0,1,2,3,4,5,6]*280)
 
-def preprocess_data(dataset,model_type):
+    x_train = x_train.astype(np.float32)
+    x_test = x_test.astype(np.float32)
 
+    y_train = y_train.astype(np.uint8)
+    y_test = y_test.astype(np.uint8)
+
+    # print(x_train.shape)
+    # # mocap = np.load("./bodydata/expertise/" +  f"new_mocap.npy")[:,::4].reshape(-1,100,48)
+    # # mocap = mocap.astype(np.float32)
+    x_train = x_train - np.tile(x_train[:,0:1,0:3],(1,150,16))
+    x_test = x_test - np.tile(x_test[:,0:1,0:3],(1,150,16))
+
+
+
+    scaler = StandardScaler()
+    width = 48
+    scaler.fit(x_train.reshape(len(x_train)*150,width))
+    x_train = scaler.transform(x_train.reshape(len(x_train)*150,width)).reshape(-1,150,width)
+    x_test = scaler.transform(x_test.reshape(len(x_test)*150,width)).reshape(-1,150,width) #(-1,150,57,1) for 57 * 1
+
+    x_train = np.array([x_train[:,:,0::3],x_train[:,:,1::3],x_train[:,:,2::3]])
+    x_test = np.array([x_test[:,:,0::3],x_test[:,:,1::3],x_test[:,:,2::3]])
+
+
+    x_train = torch.from_numpy(x_train)
+    y_train = torch.from_numpy(y_train)
+
+    x_test = torch.from_numpy(x_test)
+    y_test = torch.from_numpy(y_test)
+    x_train = x_train.permute(1,0,2,3)
+    x_test = x_test.permute(1,0,2,3)
+
+    return (x_train, y_train, x_test, y_test)
+
+def preprocess_data(dataset,model_type,study_type):
     X_train,y_train,X_test,y_test = dataset
-    
-    joints = 16
-    X_train, scaler = scaling_data(X_train,joints)
-    X_test, _ = scaling_data(X_test,joints,scaler)
 
-    X_train, y_train = transfer_input_shape(X_train,y_train,model_type)
-    X_test, y_test = transfer_input_shape(X_test,y_test,model_type)
+    if(model_type == "LDA" or model_type =="RF"):
+        features = X_train.shape[2]
+        print(features)
+        X_train, scaler = scaling_data(X_train,features)
+        X_test, _ = scaling_data(X_test,features,scaler)
+        return  X_train,y_train,X_test,y_test
+    else:
+        if(study_type == "expertise"):
+            X_train = np.concatenate([X_train[:,:,0:12],X_train[:,:,15:24],X_train[:,:,27:]],axis=2)
+            X_test = np.concatenate([X_test[:,:,0:12],X_test[:,:,15:24],X_test[:,:,27:]],axis=2)
+        features = X_train.shape[2]
+
+        X_train = X_train - np.tile(X_train[:,0:1,0:3],(1,150,16))
+        X_test = X_test - np.tile(X_test[:,0:1,0:3],(1,150,16))
+
+        X_train, scaler = scaling_data(X_train,features)
+        X_test, _ = scaling_data(X_test,features,scaler)
+
+        X_train, y_train = transfer_input_shape(X_train,y_train,model_type)
+        X_test, y_test = transfer_input_shape(X_test,y_test,model_type)
     
-    train_set = TensorDataset(X_train, y_train)
-    val_set = TensorDataset(X_test,  y_test)
-    return train_set, val_set
+        train_set = TensorDataset(X_train, y_train)
+        val_set = TensorDataset(X_test,  y_test)
+        return train_set, val_set
     
 import os
 import time
+import joblib
 from scheduler import CosineAnnealingWarmUpRestarts
 from sklearn.metrics import f1_score, accuracy_score
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.ensemble import RandomForestClassifier
 
 def select_optimizer(model_type, model):
     if model_type == "CNN":
         optimizer = torch.optim.AdamW(model.parameters(), lr = 0.001)
         scheduler = torch.optim.lr_scheduler.MultiplicativeLR(optimizer=optimizer,
-                                                                lr_lambda=lambda epoch: 0.95 ** epoch)
-    elif model_type == "LSTM":
+                                                       lr_lambda=lambda epoch: 0.95 ** epoch)
         optimizer = torch.optim.AdamW(model.parameters(), lr = 0.001)
         scheduler = torch.optim.lr_scheduler.MultiplicativeLR(optimizer=optimizer,
                                                                 lr_lambda=lambda epoch: 0.95 ** epoch)
@@ -89,11 +143,36 @@ def select_optimizer(model_type, model):
         scheduler = CosineAnnealingWarmUpRestarts(optimizer, T_0=10, T_mult=2, eta_max=0.001,  T_up=5, gamma=0.5)
     return optimizer, scheduler
 
+def train_ML(args):
+    model_type, data_type, study_type = args.model_type, args.data_type, args.study_type
+
+    dataset = load_data(data_type,model_type,study_type)
+    X_train, y_train, X_test, y_test = preprocess_data(dataset,model_type,study_type)
+    if(model_type == "LDA"):
+        dt_clf = LinearDiscriminantAnalysis()
+    else:
+        dt_clf = RandomForestClassifier()
+    dt_clf.fit(X_train, y_train)
+    joblib.dump(dt_clf,f'../pretrained_models/{model_type}/{data_type}_UE'+'.pkl')
+    pred = dt_clf.predict(X_test)
+    avg_f1_score = f1_score(y_test, pred, average='macro')
+    print(f"f1-score: {avg_f1_score}")
+    return
+
+
 def train(args):
-    model_type, data_type = args.model_type, args.data_type
+    model_type, data_type, study_type = args.model_type, args.data_type, args.study_type
+
+    if(model_type == "LDA" or model_type == "RF"):
+        train_ML(args)
+        return
+
     # prepare data
-    dataset = load_data(data_type)
-    train_set, val_set = preprocess_data(dataset,model_type)
+    dataset = load_data(data_type, model_type,study_type)
+    X_train,y_train,X_test,y_test = dataset
+    train_set = TensorDataset(X_train, y_train)
+    val_set = TensorDataset(X_test,  y_test)
+    #train_set, val_set = preprocess_data(dataset,model_type,study_type)
 
     # set dataloader
     BATCH_SIZE = 64
@@ -104,22 +183,24 @@ def train(args):
     device = "cuda"
     if(args.predefined == "custom"):
         model = select_model(model_type).to(device)
-        torch.save(model,f"model/{model_type}.pt")
+        #torch.save(model,f"model/{model_type}.pt")
     else:
         model = torch.load(f"model/{model_type}.pt")
 
     # save model
-    if not os.path.exists(f"../pretrained_models/{model_type}"):
-        os.mkdir(f"../pretrained_models/{model_type}")
+    if not os.path.exists(f"../pretrained_models/{study_type}/{model_type}"):
+        os.mkdir(f"../pretrained_models/{study_type}/{model_type}")
 
     # set hyperparameter (Lr, optimizer, scheduler)
-    NUM_EPOCH = 80  # SET EPOCH
-    LEARNING_RATE = 0.001
+    NUM_EPOCH = 100  # SET EPOCH
     TOTAL_BATCH = len(train_loader)
     VAL_TOTAL_BATCH = len(val_loader)
 
     criterion = nn.CrossEntropyLoss().to(device)  # Loss
-    optimizer, scheduler = select_optimizer(model_type,model) # Optimizer & Scheduler
+    if(args.optimize == "custom"):
+        optimizer, scheduler = select_optimizer(model_type,model) # Optimizer & Scheduler
+    else:
+        optimizer, scheduler = select_optimizer("CNN",model) # Optimizer & Scheduler
 
     # train model
     
@@ -141,7 +222,6 @@ def train(args):
             cost = criterion(out, Y)  # output & target loss 
             Y_pred = torch.max(out.data, 1)[1]
             total += len(Y)  # The number of total data
-
             cost.backward()  # backward propagation and calculate gradients
             optimizer.step()  # update parameters
 
@@ -161,7 +241,7 @@ def train(args):
         with torch.no_grad():
             for batch_idx, (X, Y) in enumerate(val_loader):
                 X = X.to(device)
-                Y = Y.to(device)
+                Y = Y.to(device).type(torch.int64)
 
                 out = model(X)
                 Y_pred = torch.max(out.data, 1)[1]  # 출력이 분류 각각에 대한 값으로 나타나기 때문에, 가장 높은 값을 갖는 인덱스를 추출
@@ -182,7 +262,7 @@ def train(args):
                 print('Test Accuracy: {:0.2f} %'.format(100. * val_correct / val_total))
         scheduler.step()
 
-    torch.save(model.state_dict(), f'../pretrained_models/{model_type}/{data_type}_UE_state_dict_{NUM_EPOCH}'+'.pt')
+    torch.save(model.state_dict(), f'../pretrained_models/{study_type}/{model_type}/{data_type}_UE_state_dict_{NUM_EPOCH}'+'.pt')
 
 
 def evaluate(args):

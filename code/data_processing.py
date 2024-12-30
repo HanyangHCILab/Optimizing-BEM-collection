@@ -2,14 +2,19 @@ import numpy as np
 import torch
 from sklearn.preprocessing import StandardScaler
 
-def scaling_data(data,joints,scaler=None):
-    
-    width = 3 * joints
-    if scaler == None:
-        scaler = StandardScaler()
-        scaler.fit(data.reshape(len(data)*150,width))
-    data = scaler.transform(data.reshape(len(data)*150,width)).reshape(-1,150,width)
-    data = np.array([data[:,:,0::3],data[:,:,1::3],data[:,:,2::3]])
+def scaling_data(data,features,scaler=None):
+    if(features >100):
+        if scaler == None:
+            scaler = StandardScaler()
+            scaler.fit(data)
+        data = scaler.transform(data)
+    else:    
+        width = features
+        if scaler == None:
+            scaler = StandardScaler()
+            scaler.fit(data.reshape(len(data)*150,width))
+        data = scaler.transform(data.reshape(len(data)*150,width)).reshape(-1,150,width)
+        data = np.array([data[:,:,0::3],data[:,:,1::3],data[:,:,2::3]])
     return data , scaler
 
 from torchvision import transforms

@@ -1,11 +1,10 @@
 import numpy as np
 import pandas as pd
-
-
+import os
 
 def load_data(data_Type):
-    train_data_path =   f"{data_Type}.npy"
-    train_label_path =  f"device_label.npy"
+    train_data_path =   f"npy/{data_Type}.npy"
+    train_label_path =  f"npy/device_label.npy"
   
     X = np.load(train_data_path )
     y = np.load(train_label_path)
@@ -32,7 +31,7 @@ def split_data(X,y):
     return X_train, y_train, X_test, y_test
 
 if __name__ == "__main__": 
-    devices = ['mocap','3DPE','kinect','iphone']
+    devices = ['mocap_feature','3DPE_feature','kinect_feature','iphone_feature']
 
     for device in devices:
         data,label = load_data(device)
