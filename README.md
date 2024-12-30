@@ -13,8 +13,8 @@ The code for optimizing  bodily emotion motion data collection method
 
 ### 2. Download Data 
 * You can download the data from this link : [https://zenodo.org/records/14576033](https://zenodo.org/records/14576033)
-* Transfrom the data from csv to numpy array ( number of data x time series x joints x axes )
-* You can do this just execute the python code  data/{expertise | device | stimulus}/train_test_split.py
+* Transfrom the data from csv to numpy array ( number of data x time series x joints x axes ) & save it to data/{expertise | device | stimulus}/npy folder
+* Then execute the python code  data/{expertise | device | stimulus}/train_test_split.py
 __ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ 
 
 
@@ -22,6 +22,7 @@ __ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ __
 ### 3. Training the model
 * You can train the model by following code
 ```
+cd code
 python train.py -s {study_name} -m {model_name} -d {data_type} -p {predefined | custom} 
 ```
 * study_name = expertise | device | stimulus
