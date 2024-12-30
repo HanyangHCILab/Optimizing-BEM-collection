@@ -25,7 +25,7 @@ __ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ __
 python train.py -s {study_name} -m {model_name} -d {data_type} -p {predefined | custom} 
 ```
 * study_name = expertise | device | stimulus
-* model_name = CNN | LSTM | GCN | Transformer
+* model_name = LDA | RF | CNN | LSTM | GCN | Transformer
 * data_type
   *   expertise: nonactor | actor
   *   device: mocap | 3DPE | kinect | iphone
