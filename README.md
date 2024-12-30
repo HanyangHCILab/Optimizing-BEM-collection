@@ -14,6 +14,7 @@ __ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ __
 ### 2. Download Data 
 * You can download the data from this link : [https://zenodo.org/records/14576033](https://zenodo.org/records/14576033)
 * Transfrom the data from csv to numpy array ( number of data x time series x joints x axes ) & save it to data/{expertise | device | stimulus}/npy folder
+  (e.g. data/device/3DPE.npy)
 * Then execute the python code  data/{expertise | device | stimulus}/train_test_split.py
 __ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ __ ____ __ __ __ __ 
 
