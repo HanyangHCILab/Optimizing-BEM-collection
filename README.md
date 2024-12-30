@@ -8,10 +8,7 @@ The code for optimizing  bodily emotion motion data collection method
 * Pytorch:  1.13.1
 * Timm:  0.9.2
 ```
-You can simply install the necessary libraries using the following command:
-```
-conda env create -f environment.yml
-```
+
 
 ### 2. Download Data & Pertrained model
 * You can download the data from this link : https://zenodo.org/records/12577086
@@ -30,9 +27,9 @@ python train.py -s {study_name} -m {model_name} -d {data_type} -p {predefined | 
 * study_name = expertise | device | stimulus
 * model_name = CNN | LSTM | GCN | Transformer
 * data_type
-*   expertise: nonactor | actor
-*   device: mocap | 3DPE | kinect | iphone
-*   stimulus: word | picture | video
+  *   expertise: nonactor | actor
+  *   device: mocap | 3DPE | kinect | iphone
+  *   stimulus: word | picture | video
 * predefined : if predefined then use .pt model else use {model}.py code ( you can custom the model architecture )
 
 ### 4. Evaluate the model
